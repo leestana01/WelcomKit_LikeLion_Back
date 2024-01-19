@@ -25,6 +25,14 @@ public class Manager implements User {
     private User manitoTo;
     private User manitoFrom;
 
-    private String teamMassage;
+    private String teamMessage;
     private boolean isTeamLeader;
+
+    public void setTeamMassage(String teamMassage) {
+        this.teamMessage = teamMassage;
+    }
+
+    public void setTeamLeader(boolean teamLeader) {
+        isTeamLeader = teamLeader;
+    }
 }
