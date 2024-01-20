@@ -1,14 +1,14 @@
-package Domain.DTO;
+package com.likelion.welcomekit.Domain.DTO;
 
-import Domain.Entity.User;
-import Domain.PartType;
+import com.likelion.welcomekit.Domain.Entity.User;
+import com.likelion.welcomekit.Domain.PartType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
 @AllArgsConstructor
-public class UserDTO implements User {
+public class UserDTO{
 
     private String name;
     private String password;
@@ -17,6 +17,4 @@ public class UserDTO implements User {
     private PartType part;
     private boolean isManager;
     private Long teamId;
-    private User manitoTo;
-    private User manitoFrom;
 }
