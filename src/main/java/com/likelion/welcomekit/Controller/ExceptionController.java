@@ -2,6 +2,7 @@ package com.likelion.welcomekit.Controller;
 
 import com.likelion.welcomekit.Exception.EntityNotBabyLionException;
 import com.likelion.welcomekit.Exception.EntityNotManagerException;
+import com.likelion.welcomekit.Exception.InvalidPasswordException;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,12 @@ public class ExceptionController {
 
     @ExceptionHandler({EntityNotManagerException.class, EntityNotBabyLionException.class})
     public ResponseEntity<?> handleUserTypeNotMatch(Exception e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler({InvalidPasswordException.class})
+    public ResponseEntity<?> handleInvalidPassword(Exception e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }

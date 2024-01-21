@@ -1,14 +1,13 @@
 package com.likelion.welcomekit.Domain.DTO;
 
-import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Domain.PartType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
-@AllArgsConstructor
-public class UserDTO{
+@NoArgsConstructor
+public class UserJoinDTO {
 
     private String name;
     private String password;
