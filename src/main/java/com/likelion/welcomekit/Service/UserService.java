@@ -48,6 +48,7 @@ public class UserService {
 
         if (
                 newUser.getUserType().equals(Types.UserType.ROLE_MANAGER)
+                        || newUser.getUserType().equals(Types.UserType.ROLE_ADMIN)
                 && userRepository.findByTeamIdAndIsTeamLeaderTrue(newUser.getTeamId()).isEmpty()
         ){
             newUser.setTeamLeader(true);
@@ -66,6 +67,9 @@ public class UserService {
         return JwtTokenProvider.createToken(
                 selectedUser.getId(),selectedUser.getUserType().toString());
     }
+
+    // ----------------------------------------------
+
 
     // ----------------------------------------------
 

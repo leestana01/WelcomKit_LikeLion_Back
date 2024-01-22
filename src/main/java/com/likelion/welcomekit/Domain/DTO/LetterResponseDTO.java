@@ -1,10 +1,8 @@
 package com.likelion.welcomekit.Domain.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter @Setter
+@Getter
 @AllArgsConstructor
 public class LetterResponseDTO {
     private String senderName;

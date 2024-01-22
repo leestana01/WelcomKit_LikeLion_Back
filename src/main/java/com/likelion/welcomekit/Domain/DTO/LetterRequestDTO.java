@@ -1,13 +1,13 @@
 package com.likelion.welcomekit.Domain.DTO;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
-@AllArgsConstructor
+@NoArgsConstructor
 public class LetterRequestDTO {
     private Long targetId;
     private String message;
-    private boolean isWelcome;
+    private Boolean isWelcome;
 }

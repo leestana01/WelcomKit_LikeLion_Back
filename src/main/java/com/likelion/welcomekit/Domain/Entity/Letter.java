@@ -1,5 +1,6 @@
 package com.likelion.welcomekit.Domain.Entity;
 
+import com.likelion.welcomekit.Domain.DTO.LetterResponseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +16,8 @@ public class Letter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private User target;
-    @OneToOne(fetch = FetchType.LAZY)
-    private User sender;
+    private Long targetId;
+    private Long senderId;
     private String message;
     private boolean isWelcome;
 }
