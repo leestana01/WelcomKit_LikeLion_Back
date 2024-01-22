@@ -18,13 +18,13 @@ public class ExceptionController {
     @ExceptionHandler({EntityNotFoundException.class})
     public ResponseEntity<String> handleEntitynotFoundException(Exception e){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(e.getMessage()+"가 발견되지 않았습니다.");
+                .body(e.getMessage()+"(이)가 발견되지 않았습니다.");
     }
 
     @ExceptionHandler({EntityExistsException.class})
     public ResponseEntity<String> handleEntityExistsException(Exception e){
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(e.getMessage()+"가 이미 존재합니다.");
+                .body(e.getMessage()+"(이)가 이미 존재합니다.");
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})

@@ -1,6 +1,7 @@
 package com.likelion.welcomekit.Service;
 
-import com.likelion.welcomekit.Domain.DTO.LetterRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.LetterManitoRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.LetterWelcomeRequestDTO;
 import com.likelion.welcomekit.Domain.DTO.LetterResponseDTO;
 import com.likelion.welcomekit.Domain.Entity.Letter;
 import com.likelion.welcomekit.Domain.Entity.User;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,14 +22,33 @@ public class LetterService {
     private final UserRepository userRepository;
     private final LetterRepository letterRepository;
 
-    public Letter createLetter(Long senderId, LetterRequestDTO dto) {
+    public void createManitoLetter(Long senderId, LetterManitoRequestDTO dto) {
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new EntityNotFoundException(senderId.toString()));
+
+        User target = sender.getManitoTo();
+        if (target == null){
+            throw new EntityNotFoundException("마니또 대상");
+        }
+
+        Letter letter = Letter.builder()
+                .senderId(senderId)
+                .targetId(target.getId())
+                .message(dto.getMessage())
+                .isWelcome(false)
+                .build();
+
+        letterRepository.save(letter);
+    }
+
+    public void createWelcomeLetter(Long senderId, LetterWelcomeRequestDTO dto){
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new EntityNotFoundException(senderId.toString()));
 
         User target = userRepository.findById(dto.getTargetId())
                 .orElseThrow(() -> new EntityNotFoundException(dto.getTargetId().toString()));
 
-        if (dto.getIsWelcome() && sender.getUserType() == Types.UserType.ROLE_USER){
+        if (sender.getUserType() == Types.UserType.ROLE_USER){
             throw new EntityNotManagerException(senderId);
         }
 
@@ -37,10 +56,10 @@ public class LetterService {
                 .senderId(senderId)
                 .targetId(target.getId())
                 .message(dto.getMessage())
-                .isWelcome(dto.getIsWelcome())
+                .isWelcome(true)
                 .build();
 
-        return letterRepository.save(letter);
+        letterRepository.save(letter);
     }
 
     public List<LetterResponseDTO> findWelcomeLettersByTargetId(Long targetId) {

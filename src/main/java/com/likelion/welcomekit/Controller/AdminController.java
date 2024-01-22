@@ -14,7 +14,7 @@ public class AdminController {
 
     @PostMapping("/sample-data")
     public String generateRandomUsers() {
-        userDataGenerator.generateRandomUsers(100000,20);
+        userDataGenerator.generateRandomUsers(100,10);
         return "성공적으로 랜덤 유저가 생성되었습니다.";
     }
 }

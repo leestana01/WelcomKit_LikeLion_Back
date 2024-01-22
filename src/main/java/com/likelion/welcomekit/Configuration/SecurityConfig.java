@@ -33,6 +33,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/v1/settings/active").permitAll()
                         .requestMatchers("/api/v1/settings/**").hasAnyRole("BOSS","ADMIN")
+
+
+                        .requestMatchers("/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

@@ -21,10 +21,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Types.PartType part;
 
+    private String profileMiniUrl;
+    private String profileUrl;
+
     @Enumerated(EnumType.STRING)
     private Types.UserType userType;
     private boolean isTeamLeader;
     private String teamMessage;
+    private String currier;
 
     private Long teamId;
 
@@ -48,5 +52,13 @@ public class User {
 
     public void setManitoFrom(User manitoFrom) {
         this.manitoFrom = manitoFrom;
+    }
+
+    public void setProfileMiniUrl(String profileMiniUrl) {
+        this.profileMiniUrl = profileMiniUrl;
+    }
+
+    public void setProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
     }
 }

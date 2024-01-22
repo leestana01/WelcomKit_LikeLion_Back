@@ -6,8 +6,6 @@ import lombok.Setter;
 
 @Getter @Setter
 @NoArgsConstructor
-public class LetterRequestDTO {
-    private Long targetId;
+public class LetterManitoRequestDTO {
     private String message;
-    private Boolean isWelcome;
 }
