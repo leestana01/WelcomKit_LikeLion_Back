@@ -47,14 +47,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         Claims claims = JwtTokenProvider.extractClaims(token);
         String userName = claims.get("userName",String.class);
         String role = claims.get("role", String.class);
-        log.info(userName);
-        log.info(role);
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         userName,
                         null,
-                        // role 부여
                         List.of(new SimpleGrantedAuthority(role)));
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
