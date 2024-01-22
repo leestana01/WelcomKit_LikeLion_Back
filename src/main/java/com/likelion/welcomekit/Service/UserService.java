@@ -16,12 +16,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
+    private final ImageService imageService;
 
     public void createUser(UserJoinDTO userJoinDTO){
         userRepository.findByName(userJoinDTO.getName())
@@ -101,7 +105,10 @@ public class UserService {
         User selectedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
 
-        String imageUrl = handleUploadImage(imageFile);
+        // 기존 이미지 파일 삭제
+        deleteExistingImage(selectedUser.getProfileUrl());
+
+        String imageUrl = imageService.handleUploadImage(imageFile, 40, 35);
 
         // 데이터베이스에 이미지 URL 정보 업데이트
         selectedUser.setProfileMiniUrl(imageUrl);
@@ -113,7 +120,10 @@ public class UserService {
         User selectedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
 
-        String imageUrl = handleUploadImage(imageFile);
+        // 기존 이미지 파일 삭제
+        deleteExistingImage(selectedUser.getProfileMiniUrl());
+
+        String imageUrl = imageService.handleUploadImage(imageFile, 220,120);
 
         // 데이터베이스에 이미지 URL 정보 업데이트
         selectedUser.setProfileMiniUrl(imageUrl);
@@ -121,32 +131,19 @@ public class UserService {
         return imageUrl;
     }
 
-    private String handleUploadImage(MultipartFile imageFile){
-        // 랜덤 파일 이름 생성
-        String originalFileName = imageFile.getOriginalFilename();
-        if (originalFileName == null || originalFileName.isEmpty()) {
-            throw new AnyExceptionsWithResponse("파일 이름이 비어서는 안됩니다.");
+    private void deleteExistingImage(String imageUrl) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+//            정석인데 의미 없음
+//            Path filePath = Paths.get("/images", imageUrl.replace("/images/", ""));
+            Path filePath = Paths.get(imageUrl);
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                // 로그 처리 또는 예외 처리
+            }
         }
-        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        String randomFileName = UUID.randomUUID().toString() + fileExtension;
-
-        // 이미지 파일 저장
-        String folderPath = "/images"; // 이미지를 저장할 폴더 경로
-        Path directoryPath = Paths.get(folderPath);
-        Path filePath = directoryPath.resolve(randomFileName);
-
-        try {
-            // 폴더 생성
-            Files.createDirectories(directoryPath);
-            // 파일 저장
-            Files.copy(imageFile.getInputStream(), filePath);
-        } catch (IOException e) {
-            throw new AnyExceptionsWithResponse("요청 처리 중 오류가 발생했습니다.");
-        }
-
-        // 이미지 URL 생성
-        return "/images/" + randomFileName;
     }
+
 
     // ----------------------------------------------
 
