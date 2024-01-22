@@ -1,10 +1,10 @@
 package com.likelion.welcomekit.Service;
 
 import com.likelion.welcomekit.Domain.DTO.UserJoinDTO;
-import com.likelion.welcomekit.Domain.DTO.UserLoginDTO;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Exception.InvalidPasswordException;
 import com.likelion.welcomekit.Repository.UserRepository;
+import com.likelion.welcomekit.Utils.JwtTokenProvider;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class UserService {
                 .password(encoder.encode(userJoinDTO.getPassword()))
                 .department(userJoinDTO.getDepartment())
                 .part(userJoinDTO.getPart())
-                .isManager(userJoinDTO.isManager())
+                .userType(userJoinDTO.getUserType())
                 .isTeamLeader(false)
                 .teamMessage("")
                 .teamId(0L)
@@ -46,7 +46,8 @@ public class UserService {
             throw new InvalidPasswordException(name);
         }
 
-        return name;
+        return JwtTokenProvider.createToken(
+                selectedUser.getName(),selectedUser.getUserType().toString());
     }
 
     public void updateTeamMessage(Long managerId, String message){

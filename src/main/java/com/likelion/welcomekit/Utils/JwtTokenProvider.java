@@ -1,36 +1,48 @@
 package com.likelion.welcomekit.Utils;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JwtTokenProvider {
+    static final SecretKey secretKey = Jwts.SIG.HS256.key().build();
 
-/*
-    // 고정된 문자열 키로, 바이트 배열을 사용하여 SecretKey 생성
-    String secretString = "my-secret-key";
-    byte[] keyBytes = secretString.getBytes(StandardCharsets.UTF_8);
-    SecretKey key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
-*/
-
-//    유동적인 키로, 매번 초기화되는 SecretKey 생성
-    SecretKey secretKey = Jwts.SIG.HS256.key().build();
-
-    public String createToken(String username, String role) {
+    public static String createToken(String userName, String role) {
         Date now = new Date();
-        // 1시간 (예시)
-        long validityInMilliseconds = 3600000;
+        long validityInMilliseconds = 3600000; // 1시간
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
+        Map<String, String> claims = new HashMap<>();
+        claims.put("role",role);
+        claims.put("userName",userName);
+
         return Jwts.builder()
-                .claim("role", role)
+                .claims(claims)
                 .issuedAt(now)
                 .expiration(validity)
                 .signWith(secretKey)
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public static Claims extractClaims(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+    }
+
+    public static boolean isExpired(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token)
+                .getPayload().getExpiration().before(new Date());
+    }
+    public static boolean validateToken(String token) {
         try {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;

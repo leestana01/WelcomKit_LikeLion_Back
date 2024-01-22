@@ -10,6 +10,21 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @GetMapping
+    public String hello(){
+        return "hello";
+    }
+
+    @GetMapping("/1")
+    public String hello1(){
+        return "hello1";
+    }
+
+    @GetMapping("/2")
+    public String hello2(){
+        return "hello2";
+    }
+
 //    // 팀원에게 남기는 메시지
 //    @PostMapping("/team/message/{id}")
 //    public ResponseEntity<String> updateTeamMessage(@PathVariable Long id, String message){

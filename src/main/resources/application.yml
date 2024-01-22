@@ -13,3 +13,6 @@ spring:
       dialect: org.hibernate.dialect.MySQL8InnoDBDialect
       hibernate:
         format_sql: true
+
+jwt:
+  secret: welcome.kit.my.secret

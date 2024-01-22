@@ -1,6 +1,6 @@
 package com.likelion.welcomekit.Domain.Entity;
 
-import com.likelion.welcomekit.Domain.PartType;
+import com.likelion.welcomekit.Domain.Types;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,9 +19,10 @@ public class User {
 
     private String department;
     @Enumerated(EnumType.STRING)
-    private PartType part;
+    private Types.PartType part;
 
-    private boolean isManager;
+    @Enumerated(EnumType.STRING)
+    private Types.UserType userType;
     private boolean isTeamLeader;
     private String teamMessage;
 

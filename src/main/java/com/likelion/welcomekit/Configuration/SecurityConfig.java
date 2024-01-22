@@ -1,6 +1,7 @@
 package com.likelion.welcomekit.Configuration;
 
-import jakarta.servlet.DispatcherType;
+import com.likelion.welcomekit.Utils.JwtTokenFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -15,6 +17,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -23,9 +27,13 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests( request -> request
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/api/v1/users/1").hasRole("USER")
+                        .requestMatchers("/api/v1/users/2").hasRole("ADMIN")
+                        .requestMatchers("/logout").permitAll()
                         .anyRequest().authenticated()
                 )
+
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .logout(withDefaults());
 
