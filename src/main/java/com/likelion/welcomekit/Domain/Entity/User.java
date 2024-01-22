@@ -41,4 +41,12 @@ public class User {
     public void setTeamLeader(boolean teamLeader) {
         isTeamLeader = teamLeader;
     }
+
+    public void setManitoTo(User manitoTo) {
+        this.manitoTo = manitoTo;
+    }
+
+    public void setManitoFrom(User manitoFrom) {
+        this.manitoFrom = manitoFrom;
+    }
 }

@@ -15,9 +15,9 @@ public class LetterService {
     private final UserRepository userRepository;
     private final LetterRepository letterRepository;
 
-    public Letter createLetter(LetterRequestDTO dto) {
-        User sender = userRepository.findById(dto.getSenderId())
-                .orElseThrow(() -> new EntityNotFoundException(dto.getSenderId().toString()));
+    public Letter createLetter(Long senderId, LetterRequestDTO dto) {
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new EntityNotFoundException(senderId.toString()));
 
         User target = userRepository.findById(dto.getTargetId())
                 .orElseThrow(() -> new EntityNotFoundException(dto.getTargetId().toString()));

@@ -13,8 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProjectSetting {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long id = 0L;
 
     private boolean isManitoActive = false;
 }

@@ -17,14 +17,14 @@ import java.util.Map;
 public class JwtTokenProvider {
     static final SecretKey secretKey = Jwts.SIG.HS256.key().build();
 
-    public static String createToken(String userName, String role) {
+    public static String createToken(Long userId, String role) {
         Date now = new Date();
         long validityInMilliseconds = 3600000; // 1시간
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
-        Map<String, String> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>();
         claims.put("role",role);
-        claims.put("userName",userName);
+        claims.put("userId",userId);
 
         return Jwts.builder()
                 .claims(claims)

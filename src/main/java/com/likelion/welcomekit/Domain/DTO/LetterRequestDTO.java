@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 public class LetterRequestDTO {
-    private Long senderId;
     private Long targetId;
     private String message;
     private boolean isWelcome;
