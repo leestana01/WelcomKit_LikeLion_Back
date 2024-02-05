@@ -1,4 +1,4 @@
-package com.likelion.welcomekit.Domain.DTO;
+package com.likelion.welcomekit.Domain.DTO.Letters;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,7 +6,6 @@ import lombok.Setter;
 
 @Getter @Setter
 @NoArgsConstructor
-public class LetterWelcomeRequestDTO {
-    private Long targetId;
+public class LetterManitoRequestDTO {
     private String message;
 }

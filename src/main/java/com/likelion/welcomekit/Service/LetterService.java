@@ -1,8 +1,8 @@
 package com.likelion.welcomekit.Service;
 
-import com.likelion.welcomekit.Domain.DTO.LetterManitoRequestDTO;
-import com.likelion.welcomekit.Domain.DTO.LetterWelcomeRequestDTO;
-import com.likelion.welcomekit.Domain.DTO.LetterResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterManitoRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterWelcomeRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterResponseDTO;
 import com.likelion.welcomekit.Domain.Entity.Letter;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Domain.Types;
@@ -76,6 +76,6 @@ public class LetterService {
     private LetterResponseDTO toResponseDTO(Letter letter){
         User sender = userRepository.findById(letter.getSenderId())
                 .orElseThrow(() -> new EntityNotFoundException(letter.getSenderId().toString()));
-        return new LetterResponseDTO(sender.getName(),letter.getMessage());
+        return new LetterResponseDTO(sender.getName(),sender.getPart(),letter.getMessage(), sender.getProfileUrl(), sender.getProfileMiniUrl());
     }
 }

@@ -22,4 +22,6 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
             "WHERE l2.targetId = :targetId AND l2.isWelcome = TRUE " +
             "GROUP BY l2.senderId)")
     List<Letter> findWelcomeLettersByTargetId(@Param("targetId") Long targetId);
+
+    List<Letter> findBySenderId(Long senderId);
 }

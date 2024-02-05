@@ -19,7 +19,7 @@ public class JwtTokenProvider {
 
     public static String createToken(Long userId, String role) {
         Date now = new Date();
-        long validityInMilliseconds = 3600000; // 1시간
+        long validityInMilliseconds = 10800000; // 1시간
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         Map<String, Object> claims = new HashMap<>();

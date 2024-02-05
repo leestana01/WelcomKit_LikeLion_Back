@@ -2,7 +2,7 @@ package com.likelion.welcomekit.Domain;
 
 public class Types {
     public enum PartType {
-        BACK, FRONT, DESIGN
+        BACK, FRONT, DESIGN, DEV
     }
 
     public enum UserType {

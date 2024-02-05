@@ -30,7 +30,7 @@ public class ImageService {
         if (resource.exists() || resource.isReadable()) {
             return resource;
         } else {
-            throw new RuntimeException("Could not read file: " + filename);
+            throw new RuntimeException("이미지 로드에 실패하였습니다: " + filename);
         }
     }
 

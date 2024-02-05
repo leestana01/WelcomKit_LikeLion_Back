@@ -1,11 +1,14 @@
 package com.likelion.welcomekit.Service;
 
+import com.likelion.welcomekit.Domain.DTO.Info.*;
 import com.likelion.welcomekit.Domain.DTO.UserJoinDTO;
-import com.likelion.welcomekit.Domain.DTO.UserMyInfoDTO;
-import com.likelion.welcomekit.Domain.DTO.UserTeammateResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Login.UserLoginResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Team.UserTeammateResponseDTO;
+import com.likelion.welcomekit.Domain.Entity.Letter;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Domain.Types;
 import com.likelion.welcomekit.Exception.*;
+import com.likelion.welcomekit.Repository.LetterRepository;
 import com.likelion.welcomekit.Repository.UserRepository;
 import com.likelion.welcomekit.Utils.JwtTokenProvider;
 import jakarta.persistence.EntityExistsException;
@@ -16,9 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
+    private final LetterRepository letterRepository;
     private final BCryptPasswordEncoder encoder;
     private final ImageService imageService;
 
@@ -70,18 +71,57 @@ public class UserService {
         userRepository.save(newUser);
     }
 
-    public String loginUser(String name, String password){
+    public UserLoginResponseDTO loginUser(String name, String password){
         User selectedUser = userRepository.findByName(name)
                 .orElseThrow(() -> new EntityNotFoundException(name));
         if(!encoder.matches(password, selectedUser.getPassword())){
             throw new InvalidPasswordException(name);
         }
 
-        return JwtTokenProvider.createToken(
-                selectedUser.getId(),selectedUser.getUserType().toString());
+        return new UserLoginResponseDTO(
+                JwtTokenProvider.createToken(selectedUser.getId(), selectedUser.getUserType().toString())
+                ,selectedUser.getUserType().toString()
+        );
+    }
+
+    public void updatePassword(Long userId, String newPassword) {
+        userRepository.findById(userId).ifPresent(user -> {
+            String encodedPassword = encoder.encode(newPassword);
+            user.setPassword(encodedPassword);
+            userRepository.save(user);
+        });
     }
 
     // ----------------------------------------------
+    public UserMyInfoResponseDTO getMyInfo(Long userId){
+        User selectedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
+
+        return new UserMyInfoResponseDTO(
+                selectedUser.getName(),
+                selectedUser.getUserType(),
+                selectedUser.getProfileUrl(),
+                selectedUser.getProfileMiniUrl());
+    }
+
+    public UserMyPageResponseDTO getMyPageInfo(Long userId){
+        User selectedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
+
+        return new UserMyPageResponseDTO(
+                selectedUser.getName(),
+                selectedUser.getTeamId(),
+                selectedUser.isTeamLeader(),
+                selectedUser.getPart(),
+                selectedUser.getDepartment(),
+
+                selectedUser.getTeamMessage(),
+                selectedUser.getTeamLeaderMessage(),
+
+                selectedUser.getProfileUrl(),
+                selectedUser.getProfileMiniUrl());
+    }
+
     public Map<String, List<UserTeammateResponseDTO>> getMyTeammates(Long userId){
         User selectedUser = userRepository.findById(userId)
                 .orElseThrow(()-> new EntityNotFoundException(userId.toString()));
@@ -94,13 +134,56 @@ public class UserService {
                         user.getUserType() == Types.UserType.ROLE_USER ? "users" : "managers"));
     }
 
-    public UserMyInfoDTO getMyInfo(Long userId){
+    public List<UserInfoResponseDTO> getMyTeammatesForManager(Long userId){
         User selectedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
+                .orElseThrow(()-> new EntityNotFoundException(userId.toString()));
 
-        return new UserMyInfoDTO(selectedUser.getName(), selectedUser.getUserType());
+        List<User> teammates = userRepository.findByTeamId(selectedUser.getTeamId());
+
+        return teammates.stream().map(user -> UserInfoResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .department(user.getDepartment())
+                .teamId(user.getTeamId())
+                .part(user.getPart())
+                .isTeamLeader(user.isTeamLeader())
+                .userType(user.getUserType())
+                .build()).collect(Collectors.toList());
     }
 
+    public List<UserInfoResponseDTO> getBabyLions(Long userId) {
+        List<User> users = userRepository.findAllByUserType(Types.UserType.ROLE_USER);
+        List<Letter> letters = letterRepository.findBySenderId(userId);
+
+        return users.stream().map(user -> {
+            boolean isMessageWritten = letters.stream().anyMatch(letter -> letter.getTargetId().equals(user.getId()));
+            return UserInfoResponseDTO.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .department(user.getDepartment())
+                    .teamId(user.getTeamId())
+                    .part(user.getPart())
+                    .isTeamLeader(user.isTeamLeader())
+                    .userType(user.getUserType())
+                    .isMessageWritten(isMessageWritten)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    public UserCountByPartResponseDTO getUserCountByPart() {
+        UserCountByPartResponseDTO dto = new UserCountByPartResponseDTO();
+        dto.setBabyLions(userRepository.countByUserType(Types.UserType.ROLE_USER));
+        dto.setManagers(userRepository.count() - dto.getBabyLions()); // 전체 유저 수에서 ROLE_USER 수를 빼면 나머지는 managers가 됩니다.
+
+        // 각 PartType에 대한 유저 수 계산
+        dto.setBack(userRepository.countByPart(Types.PartType.BACK));
+        dto.setFront(userRepository.countByPart(Types.PartType.FRONT));
+        dto.setDesign(userRepository.countByPart(Types.PartType.DESIGN));
+        dto.setDev(userRepository.countByPart(Types.PartType.DEV));
+
+        return dto;
+    }
+    // ----------------------------------------------
     public String uploadProfileImage(Long userId, MultipartFile imageFile){
         User selectedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
@@ -108,10 +191,10 @@ public class UserService {
         // 기존 이미지 파일 삭제
         deleteExistingImage(selectedUser.getProfileUrl());
 
-        String imageUrl = imageService.handleUploadImage(imageFile, 40, 35);
+        String imageUrl = imageService.handleUploadImage(imageFile, 150, 150);
 
         // 데이터베이스에 이미지 URL 정보 업데이트
-        selectedUser.setProfileMiniUrl(imageUrl);
+        selectedUser.setProfileUrl(imageUrl);
         userRepository.save(selectedUser);
         return imageUrl;
     }
@@ -123,7 +206,7 @@ public class UserService {
         // 기존 이미지 파일 삭제
         deleteExistingImage(selectedUser.getProfileMiniUrl());
 
-        String imageUrl = imageService.handleUploadImage(imageFile, 220,120);
+        String imageUrl = imageService.handleUploadImage(imageFile, 580,300);
 
         // 데이터베이스에 이미지 URL 정보 업데이트
         selectedUser.setProfileMiniUrl(imageUrl);
@@ -179,6 +262,23 @@ public class UserService {
         userRepository.saveAll(Arrays.asList(manager, teamLeader));
     }
 
+    public void updateManagerInfo(Long managerId, UserMyPageForManagerRequestDTO dto){
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new EntityNotFoundException(managerId.toString()));
+
+        if (manager.getUserType().equals(Types.UserType.ROLE_USER)){
+            throw new EntityNotManagerException(managerId);
+        }
+
+        manager.setDepartment(dto.getDepartment());
+        manager.setTeamId(dto.getTeamId());
+        manager.setPart(dto.getPart());
+        manager.setTeamMessage(dto.getTeamMessage());
+        manager.setTeamLeaderMessage(dto.getTeamLeaderMessage());
+
+        userRepository.save(manager);
+    }
+
     // -------
 
     private UserTeammateResponseDTO toTeammateResponseDTO(User user){
@@ -189,7 +289,7 @@ public class UserService {
                 .userType(user.getUserType())
                 .isTeamLeader(user.isTeamLeader())
                 .teamMessage(user.getTeamMessage())
-                .currier(user.getCurrier())
+                .teamLeaderMessage(user.getTeamLeaderMessage())
                 .build();
     }
 }

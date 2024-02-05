@@ -1,6 +1,5 @@
 package com.likelion.welcomekit.Domain.Entity;
 
-import com.likelion.welcomekit.Domain.DTO.LetterResponseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

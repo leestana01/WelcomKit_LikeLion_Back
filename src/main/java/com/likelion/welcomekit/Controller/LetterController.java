@@ -1,8 +1,8 @@
 package com.likelion.welcomekit.Controller;
 
-import com.likelion.welcomekit.Domain.DTO.LetterManitoRequestDTO;
-import com.likelion.welcomekit.Domain.DTO.LetterWelcomeRequestDTO;
-import com.likelion.welcomekit.Domain.DTO.LetterResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterManitoRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterWelcomeRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterResponseDTO;
 import com.likelion.welcomekit.Service.LetterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,14 +19,14 @@ public class LetterController {
     private final LetterService letterService;
 
     @PostMapping("/create/welcome")
-    public ResponseEntity<?> createWelcomeLetter(Authentication authentication, @ModelAttribute LetterWelcomeRequestDTO dto){
+    public ResponseEntity<?> createWelcomeLetter(Authentication authentication, @RequestBody LetterWelcomeRequestDTO dto){
         Long userId = (Long) authentication.getPrincipal();
         letterService.createWelcomeLetter(userId, dto);
         return ResponseEntity.ok("웰컴키트 편지가 정상적으로 생성됨");
     }
 
     @PostMapping("/create/manito")
-    public ResponseEntity<?> createManitoLetter(Authentication authentication, @ModelAttribute LetterManitoRequestDTO dto){
+    public ResponseEntity<?> createManitoLetter(Authentication authentication, @RequestBody LetterManitoRequestDTO dto){
         Long userId = (Long) authentication.getPrincipal();
         letterService.createManitoLetter(userId, dto);
         return ResponseEntity.ok("마니또 편지가 정상적으로 생성됨");

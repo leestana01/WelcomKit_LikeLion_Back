@@ -1,4 +1,4 @@
-package com.likelion.welcomekit.Domain.DTO;
+package com.likelion.welcomekit.Domain.DTO.Team;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

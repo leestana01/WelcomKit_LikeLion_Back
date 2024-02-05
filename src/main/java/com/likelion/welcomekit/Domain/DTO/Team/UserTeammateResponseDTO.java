@@ -1,4 +1,4 @@
-package com.likelion.welcomekit.Domain.DTO;
+package com.likelion.welcomekit.Domain.DTO.Team;
 
 import com.likelion.welcomekit.Domain.Types;
 import lombok.AllArgsConstructor;
@@ -17,5 +17,5 @@ public class UserTeammateResponseDTO {
     private Types.UserType userType;
     private boolean isTeamLeader;
     private String teamMessage;
-    private String currier;
+    private String teamLeaderMessage;
 }
