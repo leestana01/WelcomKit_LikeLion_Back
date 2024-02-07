@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -30,7 +31,7 @@ public class SecurityConfig {
             CorsConfiguration config = new CorsConfiguration();
             config.setAllowedHeaders(Collections.singletonList("*"));
             config.setAllowedMethods(Collections.singletonList("*"));
-            config.setAllowedOriginPatterns(Collections.singletonList("http://localhost:3000"));
+            config.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "http://welcomekit.klr.kr"));
             config.setAllowCredentials(true);
             return config;
         };
@@ -43,13 +44,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests( request -> request
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/managers/**").hasAnyRole("MANAGER","BOSS","ADMIN")
-                        .requestMatchers("/api/v1/users/**", "api/v1/letters/**").permitAll()
+                        .requestMatchers("/auth/**", "/users/**", "/letters/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/managers/**").hasAnyRole("MANAGER","BOSS","ADMIN")
 
-                        .requestMatchers("/api/v1/settings/active").permitAll()
-                        .requestMatchers("/api/v1/settings/**").hasAnyRole("BOSS","ADMIN")
+                        .requestMatchers("/settings/active").permitAll()
+                        .requestMatchers("/settings/**").hasAnyRole("BOSS","ADMIN")
 
 
                         .requestMatchers("/images/**").permitAll()

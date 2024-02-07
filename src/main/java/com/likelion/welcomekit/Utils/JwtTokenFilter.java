@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserService userService;
     private final SecretKey secretKey = JwtTokenProvider.secretKey;
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    @NonNull HttpServletResponse response, @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
         final String authentication = request.getHeader(HttpHeaders.AUTHORIZATION);
 

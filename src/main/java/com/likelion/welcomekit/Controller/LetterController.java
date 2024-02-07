@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/letters")
+@RequestMapping("/letters")
 public class LetterController {
     private final LetterService letterService;
 

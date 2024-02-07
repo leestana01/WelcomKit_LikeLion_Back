@@ -1,6 +1,5 @@
 package com.likelion.welcomekit;
 
-import com.likelion.welcomekit.Domain.Entity.ProjectSetting;
 import com.likelion.welcomekit.Service.ProjectSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

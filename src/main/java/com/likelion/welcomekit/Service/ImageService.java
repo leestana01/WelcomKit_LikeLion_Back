@@ -73,7 +73,7 @@ public class ImageService {
         }
 
         // 이미지 URL 생성
-        return "/images/" + randomFileName;
+        return "/api/v1/images/" + randomFileName;
     }
     private String getFileExtension(String fileName) {
         return fileName.substring(fileName.lastIndexOf(".") + 1);

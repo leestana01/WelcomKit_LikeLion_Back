@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/managers")
+@RequestMapping("/managers")
 public class ManagerController {
     private final UserService userService;
 

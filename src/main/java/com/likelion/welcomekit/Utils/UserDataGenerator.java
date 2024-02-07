@@ -4,11 +4,9 @@ import java.util.Random;
 
 import com.likelion.welcomekit.Domain.DTO.UserJoinDTO;
 import com.likelion.welcomekit.Domain.Types;
-import com.likelion.welcomekit.Repository.UserRepository;
 import com.likelion.welcomekit.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

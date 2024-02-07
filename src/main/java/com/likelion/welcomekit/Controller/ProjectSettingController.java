@@ -1,7 +1,6 @@
 package com.likelion.welcomekit.Controller;
 
 import com.likelion.welcomekit.Service.ProjectSettingService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/settings")
+@RequestMapping("/settings")
 public class ProjectSettingController {
     private final ProjectSettingService projectSettingService;
 
