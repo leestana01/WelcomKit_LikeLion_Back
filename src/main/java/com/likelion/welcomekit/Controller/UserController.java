@@ -38,6 +38,13 @@ public class UserController {
                 .body(userService.getMyPageInfo(userId));
     }
 
+    @GetMapping("/manito")
+    public ResponseEntity<?> getMyManito(Authentication authentication){
+        Long userId = (Long) authentication.getPrincipal();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.getMyManito(userId));
+    }
+
     @PreAuthorize("hasAnyRole('MANAGER','BOSS','ADMIN')")
     @GetMapping("/babylions")
     public ResponseEntity<?> getBabyLions(Authentication authentication){

@@ -3,6 +3,7 @@ package com.likelion.welcomekit.Service;
 import com.likelion.welcomekit.Domain.Entity.ProjectSetting;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Exception.AnyExceptionsWithResponse;
+import com.likelion.welcomekit.Repository.LetterRepository;
 import com.likelion.welcomekit.Repository.ProjectSettingRepository;
 import com.likelion.welcomekit.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,12 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectSettingService {
     private final ProjectSettingRepository projectSettingRepository;
     private final UserRepository userRepository;
+    private final LetterRepository letterRepository;
 
     public void initialProjectSettingDB(){
         if (projectSettingRepository.findById(0L).isPresent()){
@@ -46,8 +49,11 @@ public class ProjectSettingService {
         }
         // 마니또 시작 설정
         setProjectSettingDB(true);
+
         // User들을 랜덤으로 마니또 연결지음
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAll().stream()
+                .filter(user -> !user.isManitoDisabled())
+                .collect(Collectors.toList());
         Collections.shuffle(users);
 
         // 마지막 유저는 첫 번째 유저를 매니토로 할당
@@ -76,7 +82,6 @@ public class ProjectSettingService {
 
     public String resetManito(){
         // 마니또 생성 전으로 되돌리기. 버그 발생 또는 유사 시 대응을 위함
-        // 마니또 시작 설정
         setProjectSettingDB(false);
         // User들을 랜덤으로 마니또 연결지음
         List<User> users = userRepository.findAll();
@@ -90,8 +95,8 @@ public class ProjectSettingService {
             currentUser.setManitoTo(null);
             manitoTo.setManitoFrom(null);
         }
-
         userRepository.saveAll(users);
+        letterRepository.deleteByIsWelcomeFalse();
         return "마니또 하드 리셋 완료";
     }
 }

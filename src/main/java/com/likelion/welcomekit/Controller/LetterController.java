@@ -1,8 +1,9 @@
 package com.likelion.welcomekit.Controller;
 
 import com.likelion.welcomekit.Domain.DTO.Letters.LetterManitoRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterManitoResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterWelcomeResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Letters.LetterWelcomeRequestDTO;
-import com.likelion.welcomekit.Domain.DTO.Letters.LetterResponseDTO;
 import com.likelion.welcomekit.Service.LetterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,16 +34,23 @@ public class LetterController {
     }
 
     @GetMapping("/welcome")
-    public ResponseEntity<List<LetterResponseDTO>> findWelcomeLettersByTargetId(Authentication authentication){
+    public ResponseEntity<List<LetterWelcomeResponseDTO>> findWelcomeLettersByTargetId(Authentication authentication){
         Long userId = (Long) authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(letterService.findWelcomeLettersByTargetId(userId));
     }
 
     @GetMapping("/manito")
-    public ResponseEntity<List<LetterResponseDTO>> findManitoLettersByTargetId(Authentication authentication){
+    public ResponseEntity<List<LetterManitoResponseDTO>> findManitoLettersByTargetId(Authentication authentication){
         Long userId = (Long) authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(letterService.findManitoLettersByTargetId(userId));
+    }
+
+    @GetMapping("/manito/mine")
+    public ResponseEntity<List<LetterManitoResponseDTO>> findManitoLettersByMe(Authentication authentication){
+        Long userId = (Long) authentication.getPrincipal();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(letterService.findManitoLettersByMe(userId));
     }
 }

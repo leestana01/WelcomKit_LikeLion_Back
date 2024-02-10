@@ -1,8 +1,9 @@
 package com.likelion.welcomekit.Service;
 
 import com.likelion.welcomekit.Domain.DTO.Letters.LetterManitoRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterManitoResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Letters.LetterWelcomeResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Letters.LetterWelcomeRequestDTO;
-import com.likelion.welcomekit.Domain.DTO.Letters.LetterResponseDTO;
 import com.likelion.welcomekit.Domain.Entity.Letter;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Domain.Types;
@@ -62,20 +63,32 @@ public class LetterService {
         letterRepository.save(letter);
     }
 
-    public List<LetterResponseDTO> findWelcomeLettersByTargetId(Long targetId) {
+    public List<LetterWelcomeResponseDTO> findWelcomeLettersByTargetId(Long targetId) {
         // 내림차순 정렬하여 마지막 값 도출
         return letterRepository.findWelcomeLettersByTargetId(targetId)
-                .stream().map(this::toResponseDTO).collect(Collectors.toList());
+                .stream().map(this::toWelcomeResponseDTO).collect(Collectors.toList());
     }
 
-    public List<LetterResponseDTO> findManitoLettersByTargetId(Long targetId) {
+    public List<LetterManitoResponseDTO> findManitoLettersByTargetId(Long targetId) {
         return letterRepository.findByTargetIdAndIsWelcomeFalse(targetId)
-                .stream().map(this::toResponseDTO).collect(Collectors.toList());
+                .stream()
+                .map(letter -> new LetterManitoResponseDTO(letter.getMessage()))
+                .collect(Collectors.toList());
     }
 
-    private LetterResponseDTO toResponseDTO(Letter letter){
+    public List<LetterManitoResponseDTO> findManitoLettersByMe(Long myId) {
+        User sender = userRepository.findById(myId)
+                .orElseThrow(() -> new EntityNotFoundException(myId.toString()));
+
+        return letterRepository.findByTargetIdAndIsWelcomeFalse(sender.getManitoTo().getId())
+                .stream()
+                .map(letter -> new LetterManitoResponseDTO(letter.getMessage()))
+                .collect(Collectors.toList());
+    }
+
+    private LetterWelcomeResponseDTO toWelcomeResponseDTO(Letter letter){
         User sender = userRepository.findById(letter.getSenderId())
                 .orElseThrow(() -> new EntityNotFoundException(letter.getSenderId().toString()));
-        return new LetterResponseDTO(sender.getName(),sender.getPart(),letter.getMessage(), sender.getProfileUrl(), sender.getProfileMiniUrl());
+        return new LetterWelcomeResponseDTO(sender.getName(),sender.getPart(),letter.getMessage(), sender.getProfileUrl(), sender.getProfileMiniUrl());
     }
 }

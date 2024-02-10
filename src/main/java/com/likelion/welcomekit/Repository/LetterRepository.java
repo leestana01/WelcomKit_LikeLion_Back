@@ -1,6 +1,7 @@
 package com.likelion.welcomekit.Repository;
 
 import com.likelion.welcomekit.Domain.Entity.Letter;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +25,7 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
     List<Letter> findWelcomeLettersByTargetId(@Param("targetId") Long targetId);
 
     List<Letter> findBySenderId(Long senderId);
+
+    @Transactional
+    void deleteByIsWelcomeFalse();
 }

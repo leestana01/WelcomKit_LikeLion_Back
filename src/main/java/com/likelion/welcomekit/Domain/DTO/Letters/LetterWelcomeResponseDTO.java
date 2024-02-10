@@ -5,7 +5,7 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-public class LetterResponseDTO {
+public class LetterWelcomeResponseDTO {
     private String senderName;
     private Types.PartType part;
     private String message;

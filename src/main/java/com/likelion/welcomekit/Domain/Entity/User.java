@@ -33,6 +33,7 @@ public class User {
 
     private Long teamId;
 
+    private boolean isManitoDisabled;
     @OneToOne(fetch = FetchType.LAZY)
     private User manitoTo;
     @OneToOne(fetch = FetchType.LAZY)

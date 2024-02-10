@@ -1,6 +1,7 @@
 package com.likelion.welcomekit.Service;
 
 import com.likelion.welcomekit.Domain.DTO.Info.*;
+import com.likelion.welcomekit.Domain.DTO.ManitoResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.UserJoinDTO;
 import com.likelion.welcomekit.Domain.DTO.Login.UserLoginResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Team.UserTeammateResponseDTO;
@@ -35,6 +36,7 @@ public class UserService {
     private final LetterRepository letterRepository;
     private final BCryptPasswordEncoder encoder;
     private final ImageService imageService;
+    private final ProjectSettingService projectSettingService;
 
     public void createUser(UserJoinDTO userJoinDTO){
         userRepository.findByName(userJoinDTO.getName())
@@ -120,6 +122,19 @@ public class UserService {
 
                 selectedUser.getProfileUrl(),
                 selectedUser.getProfileMiniUrl());
+    }
+
+    public ManitoResponseDTO getMyManito(Long userId){
+        User selectedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
+
+        String manitoTo = selectedUser.getManitoTo().getName();
+        String manitoFrom = projectSettingService.getProjectSettingDB() ?
+                selectedUser.getManitoFrom().getName() : "?";
+        return new ManitoResponseDTO(
+                manitoTo,
+                manitoFrom
+        );
     }
 
     public Map<String, List<UserTeammateResponseDTO>> getMyTeammates(Long userId){
