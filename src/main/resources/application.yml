@@ -13,9 +13,9 @@ spring:
       ddl-auto: update
 #    show-sql: true
 
-logging:
-  level:
-    root: DEBUG
+#logging:
+#  level:
+#    root: DEBUG
 
 server:
   servlet:

@@ -129,7 +129,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
 
         String manitoTo = selectedUser.getManitoTo().getName();
-        String manitoFrom = projectSettingService.getProjectSettingDB() ?
+        String manitoFrom = projectSettingService.getProjectSettingDB().isManitoFinished() ?
                 selectedUser.getManitoFrom().getName() : "?";
         return new ManitoResponseDTO(
                 manitoTo,

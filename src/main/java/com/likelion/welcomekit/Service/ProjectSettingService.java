@@ -1,5 +1,6 @@
 package com.likelion.welcomekit.Service;
 
+import com.likelion.welcomekit.Domain.DTO.ProjectSettingDTO;
 import com.likelion.welcomekit.Domain.Entity.ProjectSetting;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Exception.AnyExceptionsWithResponse;
@@ -45,14 +46,15 @@ public class ProjectSettingService {
 
 
     // 마니또 활성화 여부 반환
-    public boolean getProjectSettingDB(){
-        return projectSettingRepository.findById(0L)
-                .orElseThrow(() -> new EntityNotFoundException("기본 Project Setting"))
-                .isManitoActive();
+    public ProjectSettingDTO getProjectSettingDB(){
+        ProjectSetting setting = projectSettingRepository.findById(0L)
+                .orElseThrow(() -> new EntityNotFoundException("기본 Project Setting"));
+
+        return new ProjectSettingDTO(setting.isManitoActive(), setting.isManitoFinished());
     }
 
     public String makeManito(){
-        if (getProjectSettingDB()){
+        if (getProjectSettingDB().isManitoActive()){
             throw new AnyExceptionsWithResponse("이미 시작되었습니다");
         }
         // 마니또 시작 설정
@@ -79,7 +81,7 @@ public class ProjectSettingService {
     }
 
     public String stopManito(){
-        if (!getProjectSettingDB()){
+        if (getProjectSettingDB().isManitoFinished()){
             throw new AnyExceptionsWithResponse("이미 종료되었습니다");
         }
         // 마니또 종료 설정

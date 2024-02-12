@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ProjectSettingDTO {
-    String isManitoActive;
-    String isManitoFinished;
+    boolean isManitoActive;
+    boolean isManitoFinished;
 }

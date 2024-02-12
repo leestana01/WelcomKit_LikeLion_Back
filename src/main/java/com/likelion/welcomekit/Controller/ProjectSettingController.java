@@ -1,5 +1,6 @@
 package com.likelion.welcomekit.Controller;
 
+import com.likelion.welcomekit.Domain.DTO.ProjectSettingDTO;
 import com.likelion.welcomekit.Service.ProjectSettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +19,7 @@ public class ProjectSettingController {
 
     @GetMapping("/active")
     public boolean getProjectSettingDB(){
-        return projectSettingService.getProjectSettingDB();
+        return projectSettingService.getProjectSettingDB().isManitoActive();
     }
 
     @PostMapping("/start")
