@@ -16,4 +16,5 @@ public class ProjectSetting {
     private Long id = 0L;
 
     private boolean isManitoActive = false;
+    private boolean isManitoFinished = false;
 }
