@@ -5,6 +5,7 @@ import com.likelion.welcomekit.Domain.DTO.ManitoResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.UserJoinDTO;
 import com.likelion.welcomekit.Domain.DTO.Login.UserLoginResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Team.UserTeammateResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.UserUpdate.UserUpdateDTO;
 import com.likelion.welcomekit.Domain.Entity.Letter;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Domain.Types;
@@ -14,6 +15,7 @@ import com.likelion.welcomekit.Repository.UserRepository;
 import com.likelion.welcomekit.Utils.JwtTokenProvider;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -183,6 +185,46 @@ public class UserService {
                     .isMessageWritten(isMessageWritten)
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    public List<UserUpdateDTO> getManagersForUpdate() {
+        return userRepository.findByUserTypeNot(Types.UserType.ROLE_USER).stream()
+                .map(manager -> new UserUpdateDTO(manager.getId(), manager.getName(), manager.getTeamId(), manager.isTeamLeader()) )
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateTeamAndLeaderInfo(List<UserUpdateDTO> userUpdateDTOs) {
+        // 팀별 팀장 수 계산
+        Map<Long, Long> teamLeaderCounts = userUpdateDTOs.stream()
+                .filter(UserUpdateDTO::isTeamLeader)
+                .collect(Collectors.groupingBy(UserUpdateDTO::getTeamId, Collectors.counting()));
+
+        // 팀장이 없거나 2명 이상인 팀이 있는가
+        boolean invalidTeamExists = teamLeaderCounts.values().stream().anyMatch(count -> count != 1);
+        if (invalidTeamExists) {
+            throw new RuntimeException("모든 팀에는 1명의 팀장이 존재해야합니다.");
+        }
+
+//        List<User> usersToUpdate = userUpdateDTOs.stream()
+//                .map(dto ->
+//                        {
+//                            User user = userRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException(dto.getId().toString()));
+//                            user.setTeamId(dto.getTeamId());
+//                            user.setTeamLeader(dto.isTeamLeader());
+//                            return user;
+//                        }
+//                )
+//                .collect(Collectors.toList());
+//
+//        userRepository.saveAll(usersToUpdate);
+        userUpdateDTOs.forEach(dto -> {
+            User user = userRepository.findById(dto.getId())
+                    .orElseThrow(() -> new EntityNotFoundException(dto.getId().toString()));
+            user.setTeamId(dto.getTeamId());
+            user.setTeamLeader(dto.isTeamLeader());
+            userRepository.save(user);
+        });
     }
 
     public UserCountByPartResponseDTO getUserCountByPart() {

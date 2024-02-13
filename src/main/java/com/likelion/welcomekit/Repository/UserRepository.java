@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByTeamIdAndIsTeamLeaderTrue(Long teamId);
     List<User> findByTeamId(Long teamId);
     List<User> findAllByUserType(Types.UserType userType);
+    List<User> findByUserTypeNot(Types.UserType userType);
 
 
     long countByUserType(Types.UserType userType);

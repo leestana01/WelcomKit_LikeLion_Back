@@ -4,6 +4,7 @@ import com.likelion.welcomekit.Domain.DTO.Info.UserCountByPartResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Info.UserMyPageForManagerRequestDTO;
 import com.likelion.welcomekit.Domain.DTO.Team.TeamMessageDTO;
 import com.likelion.welcomekit.Domain.DTO.Info.UserInfoResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.UserUpdate.UserUpdateDTO;
 import com.likelion.welcomekit.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,19 @@ public class ManagerController {
     public ResponseEntity<UserCountByPartResponseDTO> getUserCountByPart(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.getUserCountByPart());
+    }
+
+    // 유저 정보 일괄 수정 -------------------------------------------------------
+    @GetMapping("/info/managers")
+    public ResponseEntity<List<UserUpdateDTO>> getManagersForUpdate() {
+        List<UserUpdateDTO> managers = userService.getManagersForUpdate();
+        return ResponseEntity.ok(managers);
+    }
+
+    @PutMapping("/info")
+    public ResponseEntity<?> updateTeamAndLeaderInfo(@RequestBody List<UserUpdateDTO> userUpdateDTOs) {
+        userService.updateTeamAndLeaderInfo(userUpdateDTOs);
+        return ResponseEntity.ok().build();
     }
 
 }
