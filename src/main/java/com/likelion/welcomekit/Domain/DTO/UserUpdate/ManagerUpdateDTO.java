@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateDTO {
+public class ManagerUpdateDTO {
     private Long id;
     private String name;
     private Long teamId;

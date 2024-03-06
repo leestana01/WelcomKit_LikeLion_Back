@@ -11,6 +11,7 @@ import lombok.Getter;
 public class UserTeammateResponseDTO {
 
     private String name;
+    private String imageUrl;
     private String department;
     private Types.PartType part;
 

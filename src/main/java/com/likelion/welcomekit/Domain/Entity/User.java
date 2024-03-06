@@ -29,7 +29,7 @@ public class User {
     private boolean isTeamLeader;
     private String teamMessage;
     private String teamLeaderMessage;
-    private String currier;
+    private String currier; // 사용하지 않음. 기존 DB 처리 문제로 보존.
 
     private Long teamId;
 
@@ -39,6 +39,7 @@ public class User {
     @OneToOne(fetch = FetchType.LAZY)
     private User manitoFrom;
 
+    // Setter 안 쓴 이유 : 보안 -> 아기사자가 의도치 않은 우회 공격 수행 시, 대응하기 위함
     public void setDepartment(String department) {
         this.department = department;
     }

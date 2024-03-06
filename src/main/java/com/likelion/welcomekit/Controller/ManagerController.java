@@ -4,7 +4,8 @@ import com.likelion.welcomekit.Domain.DTO.Info.UserCountByPartResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Info.UserMyPageForManagerRequestDTO;
 import com.likelion.welcomekit.Domain.DTO.Team.TeamMessageDTO;
 import com.likelion.welcomekit.Domain.DTO.Info.UserInfoResponseDTO;
-import com.likelion.welcomekit.Domain.DTO.UserUpdate.UserUpdateDTO;
+import com.likelion.welcomekit.Domain.DTO.UserUpdate.BabyLionUpdateDTO;
+import com.likelion.welcomekit.Domain.DTO.UserUpdate.ManagerUpdateDTO;
 import com.likelion.welcomekit.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -58,14 +59,26 @@ public class ManagerController {
 
     // 유저 정보 일괄 수정 -------------------------------------------------------
     @GetMapping("/info/managers")
-    public ResponseEntity<List<UserUpdateDTO>> getManagersForUpdate() {
-        List<UserUpdateDTO> managers = userService.getManagersForUpdate();
+    public ResponseEntity<List<ManagerUpdateDTO>> getManagersForUpdate() {
+        List<ManagerUpdateDTO> managers = userService.getManagersForUpdate();
         return ResponseEntity.ok(managers);
     }
 
-    @PutMapping("/info")
-    public ResponseEntity<?> updateTeamAndLeaderInfo(@RequestBody List<UserUpdateDTO> userUpdateDTOs) {
-        userService.updateTeamAndLeaderInfo(userUpdateDTOs);
+    @GetMapping("/info/babylions")
+    public ResponseEntity<List<BabyLionUpdateDTO>> getBabyLionsForUpdate() {
+        List<BabyLionUpdateDTO> users = userService.getUsersForUpdate();
+        return ResponseEntity.ok(users);
+    }
+
+    @PutMapping("/info/managers")
+    public ResponseEntity<?> updateTeamAndLeaderInfo(@RequestBody List<ManagerUpdateDTO> managerUpdateDTOS) {
+        userService.updateTeamAndLeaderInfo(managerUpdateDTOS);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/info/babylions")
+    public ResponseEntity<?> updateBabyLionInfo(@RequestBody List<BabyLionUpdateDTO> babyLionUpdateDTOS) {
+        userService.updateBabyLionInfo(babyLionUpdateDTOS);
         return ResponseEntity.ok().build();
     }
 

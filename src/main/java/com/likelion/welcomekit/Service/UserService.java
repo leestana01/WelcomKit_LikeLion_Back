@@ -5,7 +5,8 @@ import com.likelion.welcomekit.Domain.DTO.ManitoResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.UserJoinDTO;
 import com.likelion.welcomekit.Domain.DTO.Login.UserLoginResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Team.UserTeammateResponseDTO;
-import com.likelion.welcomekit.Domain.DTO.UserUpdate.UserUpdateDTO;
+import com.likelion.welcomekit.Domain.DTO.UserUpdate.BabyLionUpdateDTO;
+import com.likelion.welcomekit.Domain.DTO.UserUpdate.ManagerUpdateDTO;
 import com.likelion.welcomekit.Domain.Entity.Letter;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Domain.Types;
@@ -187,18 +188,24 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public List<UserUpdateDTO> getManagersForUpdate() {
+    public List<ManagerUpdateDTO> getManagersForUpdate() {
         return userRepository.findByUserTypeNot(Types.UserType.ROLE_USER).stream()
-                .map(manager -> new UserUpdateDTO(manager.getId(), manager.getName(), manager.getTeamId(), manager.isTeamLeader()) )
+                .map(manager -> new ManagerUpdateDTO(manager.getId(), manager.getName(), manager.getTeamId(), manager.isTeamLeader()) )
+                .collect(Collectors.toList());
+    }
+
+    public List<BabyLionUpdateDTO> getUsersForUpdate() {
+        return userRepository.findAll().stream()
+                .map(user -> new BabyLionUpdateDTO( user.getId(), user.getName(), user.getTeamId(), user.getPart(), user.getDepartment() ))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateTeamAndLeaderInfo(List<UserUpdateDTO> userUpdateDTOs) {
+    public void updateTeamAndLeaderInfo(List<ManagerUpdateDTO> managerUpdateDTOS) {
         // 팀별 팀장 수 계산
-        Map<Long, Long> teamLeaderCounts = userUpdateDTOs.stream()
-                .filter(UserUpdateDTO::isTeamLeader)
-                .collect(Collectors.groupingBy(UserUpdateDTO::getTeamId, Collectors.counting()));
+        Map<Long, Long> teamLeaderCounts = managerUpdateDTOS.stream()
+                .filter(ManagerUpdateDTO::isTeamLeader)
+                .collect(Collectors.groupingBy(ManagerUpdateDTO::getTeamId, Collectors.counting()));
 
         // 팀장이 없거나 2명 이상인 팀이 있는가
         boolean invalidTeamExists = teamLeaderCounts.values().stream().anyMatch(count -> count != 1);
@@ -218,11 +225,23 @@ public class UserService {
 //                .collect(Collectors.toList());
 //
 //        userRepository.saveAll(usersToUpdate);
-        userUpdateDTOs.forEach(dto -> {
+        managerUpdateDTOS.forEach(dto -> {
             User user = userRepository.findById(dto.getId())
                     .orElseThrow(() -> new EntityNotFoundException(dto.getId().toString()));
             user.setTeamId(dto.getTeamId());
             user.setTeamLeader(dto.isTeamLeader());
+            userRepository.save(user);
+        });
+    }
+
+    @Transactional
+    public void updateBabyLionInfo(List<BabyLionUpdateDTO> babyLionUpdateDTOS) {
+        babyLionUpdateDTOS.forEach(dto -> {
+            User user = userRepository.findById(dto.getId())
+                    .orElseThrow(() -> new EntityNotFoundException(dto.getId().toString()));
+            user.setTeamId(dto.getTeamId());
+            user.setPart(dto.getPartType());
+            user.setDepartment(dto.getDepartment());
             userRepository.save(user);
         });
     }
@@ -341,6 +360,7 @@ public class UserService {
     private UserTeammateResponseDTO toTeammateResponseDTO(User user){
         return UserTeammateResponseDTO.builder()
                 .name(user.getName())
+                .imageUrl(user.getProfileUrl())
                 .department(user.getDepartment())
                 .part(user.getPart())
                 .userType(user.getUserType())
