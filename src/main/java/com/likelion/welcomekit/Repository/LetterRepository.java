@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LetterRepository extends JpaRepository<Letter, Long> {
@@ -23,6 +24,12 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
             "WHERE l2.targetId = :targetId AND l2.isWelcome = TRUE " +
             "GROUP BY l2.senderId)")
     List<Letter> findWelcomeLettersByTargetId(@Param("targetId") Long targetId);
+
+    @Query("SELECT l FROM Letter l WHERE l.id IN " +
+            "(SELECT MAX(l2.id) FROM Letter l2 " +
+            "WHERE l2.senderId = :senderId AND l2.targetId = :targetId AND l2.isWelcome = TRUE " +
+            "GROUP BY l2.senderId)")
+    Optional<Letter> findWelcomeLetterByTargetId(@Param("senderId") Long senderId, @Param("targetId") Long targetId);
 
     List<Letter> findBySenderId(Long senderId);
 

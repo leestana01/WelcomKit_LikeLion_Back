@@ -19,7 +19,6 @@ public class JwtTokenProvider {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role",role);
         claims.put("userId",userId);
-
         return Jwts.builder()
                 .claims(claims)
                 .issuedAt(now)

@@ -69,6 +69,14 @@ public class LetterService {
                 .stream().map(this::toWelcomeResponseDTO).collect(Collectors.toList());
     }
 
+    public LetterWelcomeResponseDTO findWelcomeLetterByTargetId(Long senderId, Long targetId) {
+        // 내림차순 정렬하여 마지막 값 도출
+        return this.toWelcomeResponseDTO(
+                letterRepository.findWelcomeLetterByTargetId(senderId, targetId)
+                        .orElseThrow(() -> new EntityNotFoundException("편지를 찾을 수 없습니다."))
+        );
+    }
+
     public List<LetterManitoResponseDTO> findManitoLettersByTargetId(Long targetId) {
         return letterRepository.findByTargetIdAndIsWelcomeFalse(targetId)
                 .stream()

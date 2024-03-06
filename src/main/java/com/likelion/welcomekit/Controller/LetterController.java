@@ -40,6 +40,13 @@ public class LetterController {
                 .body(letterService.findWelcomeLettersByTargetId(userId));
     }
 
+    @GetMapping("/welcome/{targetId}")
+    public ResponseEntity<LetterWelcomeResponseDTO> findWelcomeLettersForEditByTargetId(Authentication authentication, @PathVariable("targetId") Long targetId){
+        Long userId = (Long) authentication.getPrincipal();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(letterService.findWelcomeLetterByTargetId(userId, targetId));
+    }
+
     @GetMapping("/manito")
     public ResponseEntity<List<LetterManitoResponseDTO>> findManitoLettersByTargetId(Authentication authentication){
         Long userId = (Long) authentication.getPrincipal();
