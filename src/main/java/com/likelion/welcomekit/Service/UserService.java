@@ -1,7 +1,8 @@
 package com.likelion.welcomekit.Service;
 
 import com.likelion.welcomekit.Domain.DTO.Info.*;
-import com.likelion.welcomekit.Domain.DTO.ManitoResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Manito.ManitoResponseDTO;
+import com.likelion.welcomekit.Domain.DTO.Manito.ManitoResultDTO;
 import com.likelion.welcomekit.Domain.DTO.UserJoinDTO;
 import com.likelion.welcomekit.Domain.DTO.Login.UserLoginResponseDTO;
 import com.likelion.welcomekit.Domain.DTO.Team.UserTeammateResponseDTO;
@@ -30,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class UserService {
     private final ImageService imageService;
     private final ProjectSettingService projectSettingService;
 
+    @Transactional
     public void createUser(UserJoinDTO userJoinDTO){
         userRepository.findByName(userJoinDTO.getName())
                 .ifPresent(found -> {
@@ -97,6 +100,27 @@ public class UserService {
         });
     }
 
+    @Transactional
+    public String guessMyManito(Long userId, String userName) {
+        if (projectSettingService.getProjectSettingDB().isManitoFinished()) {
+            throw new AnyExceptionsWithResponse("종료되었습니다.");
+        }
+
+        User me = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("[본인] "+userId));
+
+        if (userName.equals("없음")) {
+            me.setSelectedManito(null);
+            userRepository.save(me);
+            return "선택 안됨";
+        }
+
+        User maybe = userRepository.findByName(userName)
+                .orElseThrow(() -> new EntityNotFoundException("[대상] "+userName));
+        me.setSelectedManito(maybe);
+        userRepository.save(me);
+        return userName;
+    }
     // ----------------------------------------------
     public UserMyInfoResponseDTO getMyInfo(Long userId){
         User selectedUser = userRepository.findById(userId)
@@ -131,13 +155,53 @@ public class UserService {
         User selectedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId.toString()));
 
+        boolean isManitoFinished = projectSettingService.getProjectSettingDB().isManitoFinished();
+
         String manitoTo = selectedUser.getManitoTo().getName();
-        String manitoFrom = projectSettingService.getProjectSettingDB().isManitoFinished() ?
-                selectedUser.getManitoFrom().getName() : "?";
+        String manitoFrom = isManitoFinished ? selectedUser.getManitoFrom().getName() : "?";
+
+        User selectedMyManito = selectedUser.getSelectedManito();
+        String selectedManito = selectedMyManito != null ? selectedMyManito.getName() : "선택 안됨";
+
+        int isGuessRight = isManitoFinished
+                ? (selectedUser.getSelectedManito() == selectedUser.getManitoFrom() ? 1 : 0)
+                : -1;
+
         return new ManitoResponseDTO(
                 manitoTo,
-                manitoFrom
+                manitoFrom,
+                selectedManito,
+                isGuessRight
         );
+    }
+
+    public List<ManitoResultDTO> getResultsOfGuessManito(){
+        boolean isManitoFinished = projectSettingService.getProjectSettingDB().isManitoFinished();
+        if (!isManitoFinished) {
+            return Collections.emptyList();
+        }
+
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .skip(3)
+                .map(user -> new ManitoResultDTO(
+                        user.getName(),
+                        user.getManitoTo().getName(),
+                        user.getManitoFrom().getName(),
+                        user.getSelectedManito() != null ? user.getSelectedManito().getName() : "",
+                        user.getManitoFrom().equals(user.getSelectedManito())
+                )).toList();
+    }
+
+    public List<String> getAllUsersForManito() {
+        List<User> allUsers = userRepository.findAll();
+        List<String> userNames = allUsers.stream()
+                .skip(3)
+                .map(User::getName)
+                .toList();
+
+        return Stream.concat(Stream.of("없음"), userNames.stream())
+                .collect(Collectors.toList());
     }
 
     public Map<String, List<UserTeammateResponseDTO>> getMyTeammates(Long userId){
@@ -309,10 +373,6 @@ public class UserService {
     public void updateTeamMessage(Long managerId, String message){
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new EntityNotFoundException(managerId.toString()));
-
-        if (manager.getUserType().equals(Types.UserType.ROLE_USER)){
-            throw new EntityNotManagerException(managerId);
-        }
 
         manager.setTeamMessage(message);
         userRepository.save(manager);

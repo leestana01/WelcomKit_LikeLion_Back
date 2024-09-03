@@ -1,6 +1,7 @@
 package com.likelion.welcomekit.Controller;
 
 import com.likelion.welcomekit.Domain.DTO.Login.UserPasswordRequestDTO;
+import com.likelion.welcomekit.Domain.DTO.Manito.ManitoSelectRequestDTO;
 import com.likelion.welcomekit.Domain.DTO.Team.TeamMessageDTO;
 import com.likelion.welcomekit.Service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,18 @@ public class UserController {
         Long userId = (Long) authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.getMyManito(userId));
+    }
+
+    @PostMapping("/selected-manito")
+    public ResponseEntity<?> selectMyManito(Authentication authentication, @RequestBody ManitoSelectRequestDTO dto){
+        Long userId = (Long) authentication.getPrincipal();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.guessMyManito(userId, dto.getSelectedManito()));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsersForManito(){
+        return ResponseEntity.ok(userService.getAllUsersForManito());
     }
 
     @PreAuthorize("hasAnyRole('MANAGER','BOSS','ADMIN')")

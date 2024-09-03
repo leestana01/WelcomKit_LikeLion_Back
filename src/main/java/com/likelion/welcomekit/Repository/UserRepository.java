@@ -1,5 +1,6 @@
 package com.likelion.welcomekit.Repository;
 
+import com.likelion.welcomekit.Domain.DTO.Manito.ManitoResultDTO;
 import com.likelion.welcomekit.Domain.Entity.User;
 import com.likelion.welcomekit.Domain.Types;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByTeamId(Long teamId);
     List<User> findAllByUserType(Types.UserType userType);
     List<User> findByUserTypeNot(Types.UserType userType);
-
 
     long countByUserType(Types.UserType userType);
 

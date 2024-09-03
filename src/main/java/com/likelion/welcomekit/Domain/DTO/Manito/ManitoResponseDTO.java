@@ -1,4 +1,4 @@
-package com.likelion.welcomekit.Domain.DTO;
+package com.likelion.welcomekit.Domain.DTO.Manito;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,4 +8,6 @@ import lombok.Getter;
 public class ManitoResponseDTO {
     String manitoTo;
     String manitoFrom;
+    String selectedManito;
+    int isGuessRight;
 }

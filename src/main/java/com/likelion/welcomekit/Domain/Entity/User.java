@@ -38,6 +38,9 @@ public class User {
     private User manitoTo;
     @OneToOne(fetch = FetchType.LAZY)
     private User manitoFrom;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "selected_manito_id") // 외래 키 컬럼 지정
+    private User selectedManito;
 
     // Setter 안 쓴 이유 : 보안 -> 아기사자가 의도치 않은 우회 공격 수행 시, 대응하기 위함
     public void setDepartment(String department) {
@@ -72,5 +75,8 @@ public class User {
     }
     public void setPassword(String encodedPassword){
         this.password = encodedPassword;
+    }
+    public void setSelectedManito(User selectedManito) {
+        this.selectedManito = selectedManito;
     }
 }

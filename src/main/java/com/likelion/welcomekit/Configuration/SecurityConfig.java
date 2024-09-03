@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/managers/**").hasAnyRole("MANAGER","BOSS","ADMIN")
 
                         .requestMatchers("/settings/active").permitAll()
+                        .requestMatchers("/settings/result").permitAll()
                         .requestMatchers("/settings/**").hasAnyRole("BOSS","ADMIN")
 
 
